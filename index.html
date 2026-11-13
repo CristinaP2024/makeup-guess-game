@@ -43,8 +43,6 @@
     <button id="startButton" type="button">Start Game</button><button id="nextButton" type="button" hidden>Next Question</button>
   </main>
 <script>
-  // Self-contained SVG artwork means every clue works without third-party image hosts.
-  // Product names are intentionally not drawn on the clue pictures.
   const questions = [
     {answer:"lipstick", aliases:["lip stick"], kind:"lipstick"},
     {answer:"mascara", aliases:[], kind:"mascara"},
@@ -67,44 +65,473 @@
     {answer:"false eyelashes", aliases:["false lashes","fake eyelashes","false eyelash"], kind:"lashes"},
     {answer:"makeup remover", aliases:["makeup cleanser","cleansing water"], kind:"remover"}
   ];
-  const colors={lipstick:["#d92762","#78143d"],mascara:["#303942","#111820"],foundation:["#d8ae8a","#8b654c"],blush:["#e68ba4","#ad4f70"],eyeshadow:["#a486b4","#57415f"],concealer:["#edc3a2","#b37d5e"],nailpolish:["#c72f62","#74213f"],brush:["#c6a37f","#59404a"],compact:["#dfd2e8","#87728e"],eyeliner:["#28252b","#09090b"],lipgloss:["#ed8eae","#ae4169"],spray:["#a9dce4","#5d9ba5"],highlighter:["#f0d47a","#b89441"],sponge:["#efb1c2","#b46c83"],browpencil:["#806044","#473326"],primer:["#d7c2ef","#9275ac"],bronzer:["#bf7748","#77452e"],lipliner:["#bd4268","#70203e"],lashes:["#292832","#0c0b10"],remover:["#a9dce2","#5d9ba5"]};
-  function productShape(k){
-    const [c,d]=colors[k];
-    const cap=(x,y,w,h,rx=8)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#shade)" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>`;
-    const bottle=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(18,w/4)}" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M${x+8} ${y+12}v${h-24}" stroke="#fff" stroke-opacity=".48" stroke-width="5" stroke-linecap="round"/>`;
-    switch(k){
-      case "lipstick": return `${cap(77,128,66,100,14)}<rect x="83" y="137" width="54" height="79" rx="8" fill="url(#product)"/><path d="M89 138V77q21-29 42 0v61z" fill="url(#shade)" stroke="${d}" stroke-width="3"/><path d="M89 77q21-29 42 0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4"/>`;
-      case "mascara": return `${cap(88,47,44,45,9)}${bottle(76,84,68,124)}<path d="M132 57h27v8h-27M157 61v78" fill="none" stroke="#17171c" stroke-width="7" stroke-linecap="round"/><path d="M150 140l15 0m-14 7l13 0m-12 7l11 0m-10 7h9m-8 7h7" stroke="#111" stroke-width="3"/>`;
-      case "foundation": return `${cap(88,41,44,27,6)}<rect x="99" y="26" width="22" height="18" rx="4" fill="#b9bbc3"/>${bottle(66,69,88,143)}<rect x="80" y="111" width="60" height="54" rx="12" fill="#f2d8be" opacity=".8"/><path d="M91 132q19-15 38 0" fill="none" stroke="#b68c6e" stroke-width="3"/>`;
-      case "blush": case "bronzer": return `<ellipse cx="110" cy="147" rx="77" ry="65" fill="#322631" opacity=".18"/><rect x="36" y="64" width="148" height="105" rx="28" fill="url(#shade)" stroke="#8e6877" stroke-width="3"/><ellipse cx="110" cy="111" rx="58" ry="38" fill="url(#product)"/><path d="M58 123q52-42 104 0" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="5"/>`;
-      case "eyeshadow": return `<rect x="29" y="59" width="162" height="128" rx="19" fill="url(#shade)" stroke="#514150" stroke-width="4"/><rect x="39" y="70" width="142" height="105" rx="11" fill="#f3e8ec"/><circle cx="70" cy="104" r="19" fill="#d68b99"/><circle cx="111" cy="104" r="19" fill="#887093"/><circle cx="151" cy="104" r="19" fill="#c79c64"/><circle cx="70" cy="148" r="16" fill="#a96e6c"/><circle cx="111" cy="148" r="16" fill="#78606b"/><circle cx="151" cy="148" r="16" fill="#d9b8cb"/>`;
-      case "concealer": case "primer": return `${cap(91,43,38,34,8)}${bottle(75,73,70,139)}<rect x="86" y="111" width="48" height="49" rx="13" fill="#fff" opacity=".34"/><circle cx="110" cy="136" r="12" fill="#fff" opacity=".35"/>`;
-      case "nailpolish": return `${cap(91,40,38,49,7)}<path d="M87 87h46l13 24v94q0 12-12 12H86q-12 0-12-12v-94z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M84 135h52v53H84z" fill="#fff" opacity=".23"/><path d="M93 100v76" stroke="#fff" stroke-opacity=".4" stroke-width="5"/>`;
-      case "brush": return `<path d="M97 121q-12-37 13-65 17-17 42-8 19 9 10 29-8 19-30 27l-17 25z" fill="#d6b995" stroke="#917359" stroke-width="3"/><path d="M114 116l16 16-56 70q-9 10-19 2-7-7 0-17z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M112 130l16 13" stroke="#d7c1aa" stroke-width="5"/>`;
-      case "compact": return `<ellipse cx="110" cy="151" rx="72" ry="53" fill="#382e3b" opacity=".2"/><path d="M39 106q0-48 71-48t71 48v49q0 42-71 42t-71-42z" fill="url(#shade)" stroke="#827186" stroke-width="4"/><ellipse cx="110" cy="107" rx="58" ry="39" fill="#e6d9e8" stroke="#fff" stroke-width="3"/><ellipse cx="110" cy="107" rx="40" ry="25" fill="#f1e7e9"/>`;
-      case "eyeliner": case "browpencil": case "lipliner": return `<path d="M49 172l96-108 28 25-96 109z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M145 64l20-23 27 24-19 24z" fill="#e5c7a2"/><path d="M49 172l29 26-24 4-16-18z" fill="#2a2029"/><path d="M79 152l65-74" stroke="#fff" stroke-opacity=".34" stroke-width="4"/>`;
-      case "lipgloss": return `${cap(92,43,36,37,8)}${bottle(76,78,68,133)}<path d="M87 111q23-19 46 0v67q-23 17-46 0z" fill="url(#product)" opacity=".75"/><path d="M89 92v71" stroke="#fff" stroke-opacity=".55" stroke-width="5"/>`;
-      case "spray": case "remover": return `${cap(91,42,38,24,5)}<path d="M99 43v-15h42v8h-25v9" fill="none" stroke="#747c83" stroke-width="7" stroke-linejoin="round"/>${bottle(72,67,76,145)}<path d="M80 145q30-19 60 0v45H80z" fill="#fff" opacity=".24"/><circle cx="97" cy="109" r="4" fill="#fff"/><circle cx="124" cy="126" r="3" fill="#fff"/>`;
-      case "highlighter": return `${cap(76,134,68,70,13)}<rect x="85" y="54" width="50" height="96" rx="15" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M91 75h38v54H91z" fill="#fff" opacity=".35"/><path d="M103 96l7-15 7 15 16 3-12 11 3 16-14-8-14 8 3-16-12-11z" fill="#fff1b7" opacity=".8"/>`;
-      case "sponge": return `<path d="M110 42q28 0 37 31 5 19 20 34 19 22 7 52-13 34-48 40-38 7-64-17-23-21-13-50 7-20 24-35 16-14 18-33 3-22 19-22z" fill="url(#product)" stroke="${d}" stroke-width="4"/><path d="M82 112q28 21 59 0" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="7" stroke-linecap="round"/>`;
-      case "lashes": return `<path d="M35 146q72-83 150-10" fill="none" stroke="#211d26" stroke-width="9" stroke-linecap="round"/>${[48,65,83,102,121,140,158,174].map((x,i)=>`<path d="M${x} ${139-Math.sin(i/7*Math.PI)*20}l${-12+i*1.5} -${22+(i<4?i*4:(7-i)*4)}" stroke="#17151b" stroke-width="4" stroke-linecap="round"/>`).join("")}`;
-      default: return `${bottle(70,65,80,145)}`;
+
+  const colors = {
+    lipstick: ["#d92762", "#7d1837", "#f8bfd0"],
+    mascara: ["#2a2a2d", "#0d1014", "#b7c7cf"],
+    foundation: ["#d7b08a", "#8a5e42", "#f4d8c4"],
+    blush: ["#e78fa8", "#a74b64", "#f3d5dd"],
+    eyeshadow: ["#a886b4", "#694c7d", "#d7caea"],
+    concealer: ["#f0d4b7", "#bb7b5d", "#fff5ee"],
+    nailpolish: ["#ca2a60", "#7a173e", "#f8bfd1"],
+    brush: ["#d4b28c", "#6a4e45", "#f0dbc1"],
+    compact: ["#e4d5e8", "#89738e", "#f5edf6"],
+    eyeliner: ["#2f2d33", "#111116", "#8d7f99"],
+    lipgloss: ["#f1a0bb", "#b94b73", "#f8d7e6"],
+    spray: ["#a7d8e3", "#5f8d9a", "#dff7ff"],
+    highlighter: ["#f0d880", "#bf983b", "#fff5bf"],
+    sponge: ["#efb1c2", "#bb6a84", "#fbe0ec"],
+    browpencil: ["#8d684e", "#47352c", "#d2b599"],
+    primer: ["#d7c2ef", "#8d6ab2", "#efe5fb"],
+    bronzer: ["#bf7748", "#744629", "#efc3a1"],
+    lipliner: ["#d24975", "#7d1d3d", "#f5bfd0"],
+    lashes: ["#2b2b35", "#101117", "#d5d9e5"],
+    remover: ["#a9dce2", "#5d8a92", "#f0fdff"]
+  };
+
+  function makeItem(kind) {
+    const [main, dark, light] = colors[kind] || ["#d98cae", "#874765", "#fbe2ee"];
+
+    const bottle = (x, y, w, h, rx, fill) =>
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${dark}" stroke-width="3"/>`;
+
+    const cap = (x, y, w, h, rx) =>
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${light}" stroke="${dark}" stroke-width="3"/>`;
+
+    switch (kind) {
+      case "lipstick":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tubeGlow" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="${light}"/><stop offset="0.5" stop-color="${main}"/><stop offset="1" stop-color="${dark}"/>
+              </linearGradient>
+            </defs>
+            <rect width="220" height="250" fill="#f8dfe7"/>
+            <ellipse cx="110" cy="210" rx="65" ry="10" fill="#7a4f63" opacity="0.18"/>
+            <g>
+              ${cap(77, 62, 66, 40, 12)}
+              <rect x="71" y="95" width="78" height="102" rx="16" fill="url(#tubeGlow)" stroke="${dark}" stroke-width="3"/>
+              <rect x="82" y="122" width="56" height="62" rx="12" fill="#f3c7d8" opacity="0.55"/>
+              <path d="M85 100L84 82 Q110 65 136 82 L135 100" fill="none" stroke="#fff" stroke-opacity="0.75" stroke-width="4" stroke-linecap="round"/>
+              <path d="M80 96H140" stroke="${dark}" stroke-opacity="0.4" stroke-width="3"/>
+              <path d="M90 140C103 134 117 134 130 140" stroke="#fff" stroke-opacity="0.7" stroke-width="4" fill="none"/>
+            </g>
+          </svg>`;
+
+      case "mascara":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#edf1f4"/>
+            <ellipse cx="110" cy="213" rx="72" ry="10" fill="#78808f" opacity="0.16"/>
+            <g>
+              <rect x="63" y="58" width="94" height="24" rx="8" fill="#d7dde3" stroke="${dark}" stroke-width="3"/>
+              <rect x="70" y="80" width="80" height="116" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="84" y="95" width="52" height="22" rx="7" fill="#1d2129" opacity="0.7"/>
+              <path d="M95 130h30v38H95z" fill="#4c5865" opacity="0.8"/>
+              <path d="M80 164c15-12 41-12 60 0" fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="5" stroke-linecap="round"/>
+              <path d="M153 92L168 110L152 128" fill="none" stroke="${dark}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M137 92L152 110L136 128" fill="none" stroke="#7d8b99" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>`;
+
+      case "foundation":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f7f1eb"/>
+            <ellipse cx="110" cy="216" rx="60" ry="10" fill="#8c6c52" opacity="0.14"/>
+            <g>
+              ${cap(87, 55, 46, 28, 7)}
+              <rect x="78" y="82" width="64" height="120" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="88" y="92" width="44" height="72" rx="10" fill="#f0d7be" opacity="0.5"/>
+              <path d="M92 128h36" stroke="#fff" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round"/>
+              <path d="M78 116h64" stroke="#fff" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round"/>
+              <path d="M89 179h42" stroke="${dark}" stroke-opacity="0.5" stroke-width="3" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "blush":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f5e1ea"/>
+            <ellipse cx="110" cy="212" rx="72" ry="10" fill="#7a4b5b" opacity="0.14"/>
+            <g>
+              <rect x="38" y="85" width="144" height="96" rx="22" fill="${light}" stroke="${dark}" stroke-width="3"/>
+              <ellipse cx="111" cy="133" rx="55" ry="34" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M54 150C84 122 139 122 169 150" fill="none" stroke="#fff" stroke-opacity="0.52" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="87" cy="120" r="9" fill="#f8d4de" opacity="0.8"/>
+              <circle cx="136" cy="139" r="8" fill="#f8d4de" opacity="0.75"/>
+            </g>
+          </svg>`;
+
+      case "eyeshadow":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f0e6f7"/>
+            <ellipse cx="110" cy="212" rx="80" ry="10" fill="#695574" opacity="0.14"/>
+            <g>
+              <rect x="39" y="74" width="142" height="118" rx="18" fill="${light}" stroke="${dark}" stroke-width="3"/>
+              <rect x="52" y="88" width="116" height="93" rx="12" fill="#f7f0fa" stroke="#8b7899" stroke-width="2"/>
+              <circle cx="73" cy="116" r="20" fill="#d28bac"/>
+              <circle cx="111" cy="116" r="20" fill="#8a74b1"/>
+              <circle cx="149" cy="116" r="20" fill="#d6ba74"/>
+              <circle cx="73" cy="154" r="17" fill="#a97a7a"/>
+              <circle cx="111" cy="154" r="17" fill="#7c6d82"/>
+              <circle cx="149" cy="154" r="17" fill="#d8c6e0"/>
+            </g>
+          </svg>`;
+
+      case "concealer":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f8eee7"/>
+            <ellipse cx="110" cy="214" rx="64" ry="10" fill="#7b5848" opacity="0.13"/>
+            <g>
+              ${cap(88, 58, 44, 30, 8)}
+              <rect x="76" y="87" width="68" height="118" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="91" y="105" width="38" height="64" rx="12" fill="#fff" opacity="0.38"/>
+              <path d="M110 183Q96 196 92 200L98 211H122L128 200Q124 196 110 183Z" fill="#e5dac7" opacity="0.9"/>
+            </g>
+          </svg>`;
+
+      case "nailpolish":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#fdeaf0"/>
+            <ellipse cx="110" cy="214" rx="60" ry="10" fill="#7d2d4c" opacity=".13"/>
+            <g>
+              ${cap(86, 46, 48, 42, 10)}
+              <rect x="76" y="85" width="68" height="118" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="89" y="102" width="42" height="60" rx="10" fill="#f4d1dc" opacity="0.7"/>
+              <circle cx="110" cy="126" r="18" fill="#fff" opacity="0.28"/>
+              <path d="M96 160H124" stroke="#fff" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "brush":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f7eee3"/>
+            <ellipse cx="118" cy="200" rx="62" ry="11" fill="#7d574e" opacity="0.14"/>
+            <g>
+              <path d="M92 78L115 60L146 90L124 138L90 120Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M116 138L126 195L146 208L167 167L154 143L138 130Z" fill="#c79e7b" stroke="${dark}" stroke-width="3"/>
+              <path d="M89 120L50 152L62 171L96 153Z" fill="${light}" stroke="${dark}" stroke-width="3"/>
+              <path d="M73 147L61 177L79 182L92 153Z" fill="${dark}" opacity="0.75"/>
+              <path d="M98 79L100 53L146 86" fill="none" stroke="#fff" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "compact":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f5edf7"/>
+            <ellipse cx="110" cy="213" rx="70" ry="10" fill="#6d4b6d" opacity="0.15"/>
+            <g>
+              <rect x="52" y="76" width="116" height="110" rx="22" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="67" y="91" width="86" height="80" rx="18" fill="#f4edf6" stroke="#a38ba2" stroke-width="2"/>
+              <circle cx="109" cy="131" r="27" fill="#f1dfe9"/>
+              <path d="M108 96V166" stroke="#fff" stroke-opacity="0.45" stroke-width="3"/>
+              <path d="M82 131H136" stroke="#fff" stroke-opacity="0.45" stroke-width="3"/>
+            </g>
+          </svg>`;
+
+      case "eyeliner":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f4eff3"/>
+            <ellipse cx="110" cy="212" rx="62" ry="10" fill="#62556a" opacity="0.15"/>
+            <g>
+              <path d="M72 176L138 64L162 82L96 194Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M136 61L165 38L184 57L155 80Z" fill="#d9c8bb" stroke="${dark}" stroke-width="3"/>
+              <path d="M74 176L54 210H76L97 176Z" fill="#1f1c22" stroke="#000" stroke-width="2"/>
+              <path d="M100 136L138 94" stroke="#fff" stroke-opacity="0.38" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "lipgloss":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#fbeaf1"/>
+            <ellipse cx="110" cy="214" rx="66" ry="10" fill="#7a4b64" opacity="0.14"/>
+            <g>
+              ${cap(88, 56, 44, 28, 8)}
+              <rect x="73" y="81" width="74" height="118" rx="20" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="85" y="95" width="50" height="64" rx="12" fill="#fbe4ef" opacity="0.75"/>
+              <path d="M90 132C101 118 119 118 130 132" fill="none" stroke="#fff" stroke-opacity="0.75" stroke-width="4" stroke-linecap="round"/>
+              <path d="M95 185H125" stroke="#fff" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "spray":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#edf8fb"/>
+            <ellipse cx="110" cy="212" rx="70" ry="10" fill="#57707b" opacity="0.14"/>
+            <g>
+              <rect x="78" y="54" width="64" height="22" rx="7" fill="#ced9db" stroke="${dark}" stroke-width="3"/>
+              <path d="M88 76H132L146 100V186C146 196 138 204 128 204H92C82 204 74 196 74 186V100L88 76Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M87 134C109 118 131 118 144 134" fill="none" stroke="#fff" stroke-opacity="0.65" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="98" cy="107" r="4" fill="#fff" opacity="0.8"/>
+              <circle cx="116" cy="113" r="4" fill="#fff" opacity="0.8"/>
+              <circle cx="130" cy="106" r="4" fill="#fff" opacity="0.8"/>
+            </g>
+          </svg>`;
+
+      case "highlighter":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#fff8d9"/>
+            <ellipse cx="110" cy="214" rx="68" ry="10" fill="#947b2d" opacity="0.15"/>
+            <g>
+              <rect x="82" y="78" width="56" height="118" rx="16" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M90 108L110 84L130 108L139 111L124 125L130 143L110 137L90 143L96 125L81 111Z" fill="#fff2aa" opacity="0.8"/>
+              <path d="M90 150H130" stroke="#fff" stroke-opacity="0.65" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "sponge":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f9e3ec"/>
+            <ellipse cx="110" cy="212" rx="70" ry="10" fill="#7a586c" opacity="0.14"/>
+            <g>
+              <path d="M110 57C138 57 161 79 161 107C161 136 139 160 110 160C81 160 59 138 59 107C59 79 82 57 110 57Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M90 87C98 100 111 110 130 118" fill="none" stroke="#fff" stroke-opacity="0.68" stroke-width="6" stroke-linecap="round"/>
+              <path d="M82 111C96 122 110 126 129 123" fill="none" stroke="#fff" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/>
+              <path d="M90 132C103 141 118 143 132 132" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="5" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "browpencil":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f5ece4"/>
+            <ellipse cx="110" cy="212" rx="62" ry="10" fill="#735d4d" opacity="0.15"/>
+            <g>
+              <path d="M72 177L126 74L153 95L97 199Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M126 74L159 48L182 70L149 95Z" fill="#d8b38a" stroke="${dark}" stroke-width="3"/>
+              <path d="M95 198L74 218H95L106 198Z" fill="#1a1413" opacity="0.9"/>
+              <path d="M110 130L134 100" stroke="#fff" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "primer":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f2edf8"/>
+            <ellipse cx="110" cy="212" rx="68" ry="10" fill="#7d6790" opacity="0.15"/>
+            <g>
+              ${cap(86, 58, 48, 28, 8)}
+              <rect x="77" y="86" width="66" height="110" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <rect x="89" y="97" width="42" height="72" rx="11" fill="#f4ebff" opacity="0.55"/>
+              <path d="M89 128H131" stroke="#fff" stroke-opacity="0.6" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "bronzer":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f9efe4"/>
+            <ellipse cx="110" cy="212" rx="72" ry="10" fill="#7c4830" opacity="0.15"/>
+            <g>
+              <circle cx="110" cy="131" r="66" fill="${main}" stroke="${dark}" stroke-width="4"/>
+              <circle cx="110" cy="131" r="45" fill="${light}" opacity="0.66"/>
+              <path d="M86 123C97 109 122 109 134 123" fill="none" stroke="#fff" stroke-opacity="0.52" stroke-width="5" stroke-linecap="round"/>
+              <path d="M61 151C87 135 131 136 159 151" fill="none" stroke="#fff" stroke-opacity="0.42" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "lipliner":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#fcebee"/>
+            <ellipse cx="110" cy="214" rx="62" ry="10" fill="#7a2d42" opacity="0.14"/>
+            <g>
+              <path d="M53 170L129 75L157 101L82 196Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M129 75L160 49L182 71L152 97Z" fill="#d8c2b0" stroke="${dark}" stroke-width="3"/>
+              <path d="M74 170L54 210H82L96 170Z" fill="#1f1b20"/>
+              <path d="M98 134L142 95" stroke="#fff" stroke-opacity="0.4" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "lashes":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#eef2fa"/>
+            <ellipse cx="110" cy="206" rx="78" ry="10" fill="#5d617b" opacity="0.12"/>
+            <g>
+              <path d="M38 142Q93 78 160 118" fill="none" stroke="${dark}" stroke-width="7" stroke-linecap="round"/>
+              <path d="M48 151Q95 95 165 123" fill="none" stroke="${dark}" stroke-width="6" stroke-linecap="round"/>
+              <path d="M48 160Q90 118 150 153" fill="none" stroke="${dark}" stroke-width="5" stroke-linecap="round"/>
+              <path d="M60 147L77 127" stroke="#1d2029" stroke-width="3" stroke-linecap="round"/>
+              <path d="M86 143L99 120" stroke="#1d2029" stroke-width="3" stroke-linecap="round"/>
+              <path d="M112 145L125 119" stroke="#1d2029" stroke-width="3" stroke-linecap="round"/>
+              <path d="M136 147L149 122" stroke="#1d2029" stroke-width="3" stroke-linecap="round"/>
+              <path d="M160 150L174 128" stroke="#1d2029" stroke-width="3" stroke-linecap="round"/>
+            </g>
+          </svg>`;
+
+      case "remover":
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#ebf6fb"/>
+            <ellipse cx="110" cy="213" rx="70" ry="10" fill="#5d7c84" opacity="0.15"/>
+            <g>
+              ${cap(87, 58, 46, 20, 7)}
+              <path d="M70 81H150L162 192C162 201 155 208 146 208H74C65 208 58 201 58 192L70 81Z" fill="${main}" stroke="${dark}" stroke-width="3"/>
+              <path d="M88 93H132" stroke="#fff" stroke-opacity="0.65" stroke-width="4" stroke-linecap="round"/>
+              <path d="M79 146C96 132 124 132 141 146" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="110" cy="128" r="22" fill="#dff8ff" opacity="0.5"/>
+            </g>
+          </svg>`;
+
+      default:
+        return `
+          <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+            <rect width="220" height="250" fill="#f8e7ef"/>
+            <rect x="71" y="75" width="78" height="120" rx="18" fill="${main}" stroke="${dark}" stroke-width="3"/>
+            <rect x="83" y="52" width="54" height="30" rx="8" fill="${light}" stroke="${dark}" stroke-width="3"/>
+          </svg>`;
     }
   }
-  function productArt(kind){const [a,b]=colors[kind]||["#d98cae","#874765"];return `<svg viewBox="0 0 220 250" role="img" aria-label="Unlabeled makeup product illustration" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#fff8fb"/><stop offset="1" stop-color="#f3dbe5"/></linearGradient><linearGradient id="product" x1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset=".48" stop-color="${b}"/><stop offset="1" stop-color="${a}"/></linearGradient><linearGradient id="shade" x1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".3" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#563445" flood-opacity=".24"/></filter><radialGradient id="light"><stop stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="220" height="250" fill="url(#bg)"/><circle cx="34" cy="42" r="45" fill="url(#light)"/><circle cx="191" cy="203" r="52" fill="url(#light)"/><ellipse cx="110" cy="218" rx="70" ry="11" fill="#7f5367" opacity=".15"/><g filter="url(#shadow)">${productShape(kind)}</g><path d="M18 219h184" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>`;}
 
-  const $=id=>document.getElementById(id), picture=$("picture"),progress=$("progress"),timerDisplay=$("timer"),answerInput=$("answer"),answerForm=$("answerForm"),submitButton=$("submitButton"),startButton=$("startButton"),nextButton=$("nextButton"),message=$("message"),scoreDisplay=$("score"),confettiLayer=$("confetti-layer");
-  const QUESTION_TIME=30; let gameQuestions=[],currentQuestion=0,score=0,timerInterval=null,questionComplete=false,audioContext;
-  function playSound(correct){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext??=new AC();if(audioContext.state==="suspended")audioContext.resume();const now=audioContext.currentTime;(correct?[659.25,830.61,987.77]:[220,164.81]).forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),t=now+i*(correct?.12:.18);osc.type=correct?"sine":"triangle";osc.frequency.value=hz;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.12,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+.22);osc.connect(gain);gain.connect(audioContext.destination);osc.start(t);osc.stop(t+.23);});}catch(e){}}
-  function confetti(){const colorsList=["#e94f9a","#f6c445","#7b61c9","#4bbf9f","#ff7b54","#fff"];for(let i=0;i<75;i++){const p=document.createElement("span");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.backgroundColor=colorsList[Math.floor(Math.random()*colorsList.length)];p.style.animationDelay=Math.random()*.55+"s";p.style.setProperty("--drift",(Math.random()*220-110)+"px");confettiLayer.appendChild(p);p.addEventListener("animationend",()=>p.remove(),{once:true});}}
-  function blink(correct){document.body.classList.remove("flash-correct","flash-wrong");void document.body.offsetWidth;document.body.classList.add(correct?"flash-correct":"flash-wrong");setTimeout(()=>document.body.classList.remove("flash-correct","flash-wrong"),1300);}
-  function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
-  function result(correct,timedOut=false){if(questionComplete)return;questionComplete=true;stopTimer();const q=gameQuestions[currentQuestion];answerInput.disabled=true;submitButton.disabled=true;playSound(correct);if(correct){score++;scoreDisplay.textContent=score;message.textContent="Correct! 🎉";blink(true);confetti();}else{message.textContent=timedOut?`Time's up! It was ${q.answer}.`:`Not quite! It was ${q.answer}.`;blink(false);}nextButton.textContent=currentQuestion===gameQuestions.length-1?"See Final Score":"Next Question";nextButton.hidden=false;}
-  function startTimer(){stopTimer();let left=QUESTION_TIME;timerDisplay.textContent=`Time left: ${left}s`;timerInterval=setInterval(()=>{left--;timerDisplay.textContent=`Time left: ${left}s`;if(left<=0)result(false,true);},1000);}
-  function showQuestion(){const q=gameQuestions[currentQuestion];picture.innerHTML=productArt(q.kind);picture.setAttribute("aria-label","Unlabeled makeup product illustration");progress.textContent=`Question ${currentQuestion+1} of ${gameQuestions.length}`;answerInput.value="";answerInput.disabled=false;submitButton.disabled=false;message.textContent="";nextButton.hidden=true;questionComplete=false;answerInput.focus();startTimer();}
-  startButton.addEventListener("click",()=>{gameQuestions=[...questions].sort(()=>Math.random()-.5);currentQuestion=0;score=0;scoreDisplay.textContent=score;startButton.hidden=true;showQuestion();});
-  answerForm.addEventListener("submit",e=>{e.preventDefault();const guess=answerInput.value.trim().toLowerCase();if(!guess){message.textContent="Type your guess first!";return;}const q=gameQuestions[currentQuestion];result([q.answer,...q.aliases].map(a=>a.toLowerCase()).includes(guess));});
-  nextButton.addEventListener("click",()=>{currentQuestion++;if(currentQuestion<gameQuestions.length)showQuestion();else{stopTimer();picture.innerHTML="<span style='font-size:70px'>Great job!</span>";progress.textContent="";timerDisplay.textContent="";message.textContent=`Game over! You scored ${score} out of ${gameQuestions.length}.`;nextButton.hidden=true;startButton.hidden=false;startButton.textContent="Play Again";}});
+  const $ = id => document.getElementById(id);
+  const picture = $("picture"), progress = $("progress"), timerDisplay = $("timer"), answerInput = $("answer"), answerForm = $("answerForm"), submitButton = $("submitButton"), startButton = $("startButton"), nextButton = $("nextButton"), message = $("message"), scoreDisplay = $("score"), confettiLayer = $("confetti-layer");
+  const QUESTION_TIME = 30;
+  let gameQuestions = [], currentQuestion = 0, score = 0, timerInterval = null, questionComplete = false, audioContext;
+
+  function playSound(correct){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audioContext ??= new AC();
+      if (audioContext.state === "suspended") audioContext.resume();
+      const now = audioContext.currentTime;
+      (correct ? [659.25, 830.61, 987.77] : [220, 164.81]).forEach((hz, i) => {
+        const osc = audioContext.createOscillator(), gain = audioContext.createGain(), t = now + i * (correct ? .12 : .18);
+        osc.type = correct ? "sine" : "triangle";
+        osc.frequency.value = hz;
+        gain.gain.setValueAtTime(.0001, t);
+        gain.gain.exponentialRampToValueAtTime(.12, t + .02);
+        gain.gain.exponentialRampToValueAtTime(.0001, t + .22);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start(t);
+        osc.stop(t + .23);
+      });
+    } catch (e) {}
+  }
+
+  function confetti(){
+    const colorsList = ["#e94f9a", "#f6c445", "#7b61c9", "#4bbf9f", "#ff7b54", "#fff"];
+    for (let i = 0; i < 75; i++) {
+      const p = document.createElement("span");
+      p.className = "confetti-piece";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.backgroundColor = colorsList[Math.floor(Math.random() * colorsList.length)];
+      p.style.animationDelay = Math.random() * .55 + "s";
+      p.style.setProperty("--drift", (Math.random() * 220 - 110) + "px");
+      confettiLayer.appendChild(p);
+      p.addEventListener("animationend", () => p.remove(), { once: true });
+    }
+  }
+
+  function blink(correct){
+    document.body.classList.remove("flash-correct", "flash-wrong");
+    void document.body.offsetWidth;
+    document.body.classList.add(correct ? "flash-correct" : "flash-wrong");
+    setTimeout(() => document.body.classList.remove("flash-correct", "flash-wrong"), 1300);
+  }
+
+  function stopTimer(){
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function result(correct, timedOut = false){
+    if (questionComplete) return;
+    questionComplete = true;
+    stopTimer();
+    const q = gameQuestions[currentQuestion];
+    answerInput.disabled = true;
+    submitButton.disabled = true;
+    playSound(correct);
+    if (correct) {
+      score++;
+      scoreDisplay.textContent = score;
+      message.textContent = "Correct! 🎉";
+      blink(true);
+      confetti();
+    } else {
+      message.textContent = timedOut ? `Time's up! It was ${q.answer}.` : `Not quite! It was ${q.answer}.`;
+      blink(false);
+    }
+    nextButton.textContent = currentQuestion === gameQuestions.length - 1 ? "See Final Score" : "Next Question";
+    nextButton.hidden = false;
+  }
+
+  function startTimer(){
+    stopTimer();
+    let left = QUESTION_TIME;
+    timerDisplay.textContent = `Time left: ${left}s`;
+    timerInterval = setInterval(() => {
+      left--;
+      timerDisplay.textContent = `Time left: ${left}s`;
+      if (left <= 0) result(false, true);
+    }, 1000);
+  }
+
+  function showQuestion(){
+    const q = gameQuestions[currentQuestion];
+    picture.innerHTML = makeItem(q.kind);
+    picture.setAttribute("aria-label", "Unlabeled makeup product illustration");
+    progress.textContent = `Question ${currentQuestion + 1} of ${gameQuestions.length}`;
+    answerInput.value = "";
+    answerInput.disabled = false;
+    submitButton.disabled = false;
+    message.textContent = "";
+    nextButton.hidden = true;
+    questionComplete = false;
+    answerInput.focus();
+    startTimer();
+  }
+
+  startButton.addEventListener("click", () => {
+    gameQuestions = [...questions].sort(() => Math.random() - 0.5);
+    currentQuestion = 0;
+    score = 0;
+    scoreDisplay.textContent = score;
+    startButton.hidden = true;
+    showQuestion();
+  });
+
+  answerForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const guess = answerInput.value.trim().toLowerCase();
+    if (!guess) {
+      message.textContent = "Type your guess first!";
+      return;
+    }
+    const q = gameQuestions[currentQuestion];
+    result([q.answer, ...q.aliases].map(a => a.toLowerCase()).includes(guess));
+  });
+
+  nextButton.addEventListener("click", () => {
+    currentQuestion++;
+    if (currentQuestion < gameQuestions.length) {
+      showQuestion();
+    } else {
+      stopTimer();
+      picture.innerHTML = "<span style='font-size:70px'>Great job!</span>";
+      progress.textContent = "";
+      timerDisplay.textContent = "";
+      message.textContent = `Game over! You scored ${score} out of ${gameQuestions.length}.`;
+      nextButton.hidden = true;
+      startButton.hidden = false;
+      startButton.textContent = "Play Again";
+    }
+  });
 </script>
 </body>
 </html>
