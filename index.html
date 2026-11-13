@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guess the Makeup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 620px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+      background: #fce9f1;
+      color: #000000;
+      transition: background-color 0.25s ease;
+    }
+
+    body.flash-correct {
+      background: #9ae6ab;
+    }
+
+    body.flash-wrong {
+      background: #f7a3a3;
+    }
+
+    .game {
+      padding: 24px;
+      background: #fce9f1;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      color: #000000;
+    }
+
+    #picture {
+      height: 220px;
+      display: grid;
+      place-items: center;
+      background: #f3bfd4;
+      border-radius: 12px;
+      margin: 20px 0;
+      color: #000000;
+    }
+
+    #picture svg {
+      width: 200px;
+      height: 200px;
+    }
+
+    input, button {
+      font-size: 1rem;
+      padding: 10px;
+      margin: 6px;
+      color: #000000;
+    }
+
+    input {
+      width: 70%;
+      box-sizing: border-box;
+      background: #ffffff;
+      border: 1px solid #000000;
+    }
+
+    button {
+      background: #ffffff;
+      border: 1px solid #000000;
+      cursor: pointer;
+    }
+
+    #message {
+      min-height: 1.5em;
+      font-weight: bold;
+      color: #000000;
+    }
+
+    #timer {
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>Guess the Makeup!</h1>
+    <p id="progress"></p>
+    <div id="timer">Time left: 30s</div>
+
+    <p>What type of makeup is shown?</p>
+
+    <div id="picture" role="img" aria-label="Makeup product illustration">
+      <span>Press Start to play!</span>
+    </div>
+
+    <form id="answerForm">
+      <input id="answer" type="text" placeholder="Type your guess" autocomplete="off" disabled>
+      <button id="submitButton" type="submit" disabled>Guess</button>
+    </form>
+
+    <p id="message" aria-live="polite"></p>
+    <p>Score: <span id="score">0</span></p>
+
+    <button id="startButton" type="button">Start Game</button>
+    <button id="nextButton" type="button" hidden>Next Question</button>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        answer: "lipstick",
+        aliases: ["lip stick"],
+        art: `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="69" y="95" width="62" height="72" rx="8" fill="#c2185b"/>
+            <rect x="64" y="157" width="72" height="18" rx="5" fill="#8e1748"/>
+            <path d="M75 95 L75 62 Q100 38 125 62 L125 95 Z" fill="#ed4b83"/>
+            <path d="M75 62 Q100 45 125 62" fill="none" stroke="#ad174e" stroke-width="4"/>
+            <rect x="70" y="113" width="60" height="8" fill="#f8a4c1"/>
+          </svg>`
+      },
+      {
+        answer: "mascara",
+        aliases: ["mascara"],
+        art: `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="55" y="75" width="76" height="28" rx="8" fill="#222"/>
+            <rect x="55" y="75" width="18" height="28" rx="5" fill="#d94b79"/>
+            <path d="M131 89 L161 89" stroke="#333" stroke-width="7"/>
+            <path d="M160 75 L160 103" stroke="#333" stroke-width="5"/>
+            <path d="M153 78 L167 78 M153 84 L167 84 M153 90 L167 90 M153 96 L167 96 M153 102 L167 102"
+              stroke="#333" stroke-width="2"/>
+            <text x="84" y="94" font-size="12" fill="white" font-family="Arial">LASH</text>
+          </svg>`
+      },
+      {
+        answer: "foundation",
+        aliases: ["liquid foundation"],
+        art: `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="77" y="60" width="46" height="16" rx="4" fill="#333"/>
+            <rect x="91" y="45" width="18" height="18" fill="#555"/>
+            <rect x="68" y="75" width="64" height="94" rx="12" fill="#d7a47c"/>
+            <rect x="75" y="91" width="50" height="48" rx="5" fill="#f3d9c2"/>
+            <text x="100" y="112" text-anchor="middle" font-size="10" fill="#704a36" font-family="Arial">SKIN</text>
+            <text x="100" y="126" text-anchor="middle" font-size="9" fill="#704a36" font-family="Arial">FOUNDATION</text>
+          </svg>`
+      },
+      {
+        answer: "blush",
+        aliases: ["powder blush", "rouge"],
+        art: `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="111" rx="61" ry="49" fill="#d8d8e2"/>
+            <ellipse cx="100" cy="104" rx="61" ry="49" fill="#f4b4c6" stroke="#b65c79" stroke-width="5"/>
+            <ellipse cx="100" cy="104" rx="43" ry="33" fill="#e8799c"/>
+            <path d="M64 104 Q100 79 136 104 Q100 130 64 104" fill="#f29bb4"/>
+            <circle cx="100" cy="104" r="8" fill="#f8c5d2"/>
+          </svg>`
+      },
+      {
+        answer: "eyeshadow",
+        aliases: ["eye shadow", "eyeshadow palette", "eye shadow palette"],
+        art: `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="35" y="57" width="130" height="92" rx="12" fill="#493b59"/>
+            <rect x="43" y="65" width="114" height="76" rx="8" fill="#f0d8e7"/>
+            <circle cx="64" cy="91" r="15" fill="#d889a8"/>
+            <circle cx="100" cy="91" r="15" fill="#8e6e9f"/>
+            <circle cx="136" cy="91" r="15" fill="#c8a05e"/>
+            <circle cx="64" cy="121" r="12" fill="#e9b7a3"/>
+            <circle cx="100" cy="121" r="12" fill="#76545d"/>
+            <circle cx="136" cy="121" r="12" fill="#b9a5c9"/>
+          </svg>`
+      },
+      {
+        answer: "concealer",
+        aliases: [],
+        art: `<span style="font-size:100px">🧴</span>`
+      },
+      {
+        answer: "nail polish",
+        aliases: ["nail varnish"],
+        art: `<span style="font-size:100px">💅</span>`
+      },
+      {
+        answer: "makeup brush",
+        aliases: ["brush"],
+        art: `<span style="font-size:100px">🖌️</span>`
+      },
+      {
+        answer: "compact powder",
+        aliases: ["powder"],
+        art: `<span style="font-size:100px">🪞</span>`
+      },
+      {
+        answer: "eyeliner",
+        aliases: ["eye liner"],
+        art: `<span style="font-size:100px">✒️</span>`
+      },
+      {
+        answer: "lip gloss",
+        aliases: ["lipgloss"],
+        art: `<span style="font-size:100px">💋</span>`
+      },
+      {
+        answer: "setting spray",
+        aliases: ["makeup setting spray"],
+        art: `<span style="font-size:100px">💦</span>`
+      },
+      {
+        answer: "highlighter",
+        aliases: ["makeup highlighter"],
+        art: `<span style="font-size:100px">✨</span>`
+      },
+      {
+        answer: "makeup sponge",
+        aliases: ["beauty sponge", "blending sponge"],
+        art: `<span style="font-size:100px">🧽</span>`
+      },
+      {
+        answer: "eyebrow pencil",
+        aliases: ["brow pencil"],
+        art: `<span style="font-size:100px">✏️</span>`
+      }
+    ];
+
+    const picture = document.getElementById("picture");
+    const progress = document.getElementById("progress");
+    const timerDisplay = document.getElementById("timer");
+    const answerInput = document.getElementById("answer");
+    const answerForm = document.getElementById("answerForm");
+    const submitButton = document.getElementById("submitButton");
+    const startButton = document.getElementById("startButton");
+    const nextButton = document.getElementById("nextButton");
+    const message = document.getElementById("message");
+    const scoreDisplay = document.getElementById("score");
+
+    const QUESTION_TIME = 30;
+    let gameQuestions = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = QUESTION_TIME;
+    let timerInterval = null;
+
+    function flashBackground(type) {
+      document.body.classList.remove("flash-correct", "flash-wrong");
+      void document.body.offsetWidth;
+      document.body.classList.add(type === "correct" ? "flash-correct" : "flash-wrong");
+      setTimeout(() => {
+        document.body.classList.remove("flash-correct", "flash-wrong");
+      }, 400);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function handleAnswerResult(isCorrect, timedOut = false) {
+      stopTimer();
+
+      const item = gameQuestions[currentQuestion];
+      const acceptedAnswers = [item.answer, ...item.aliases];
+
+      answerInput.disabled = true;
+      submitButton.disabled = true;
+
+      if (isCorrect) {
+        score++;
+        scoreDisplay.textContent = score;
+        message.textContent = "Correct! 🎉";
+        flashBackground("correct");
+      } else {
+        if (timedOut) {
+          message.textContent = `Time's up! It was ${item.answer}.`;
+        } else {
+          message.textContent = `Not quite! It was ${item.answer}.`;
+        }
+        flashBackground("wrong");
+      }
+
+      nextButton.textContent =
+        currentQuestion === gameQuestions.length - 1 ? "See Final Score" : "Next Question";
+      nextButton.hidden = false;
+    }
+
+    function startTimer() {
+      stopTimer();
+      timeLeft = QUESTION_TIME;
+
+      const countdown = () => {
+        timeLeft--;
+        timerDisplay.textContent = `Time left: ${Math.max(timeLeft, 0)}s`;
+        if (timeLeft <= 0) {
+          stopTimer();
+          handleAnswerResult(false, true);
+        }
+      };
+
+      countdown();
+      timerInterval = setInterval(countdown, 1000);
+    }
+
+    function startGame() {
+      gameQuestions = [...questions].sort(() => Math.random() - 0.5);
+      currentQuestion = 0;
+      score = 0;
+      scoreDisplay.textContent = score;
+      startButton.hidden = true;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const item = gameQuestions[currentQuestion];
+      picture.innerHTML = item.art;
+      progress.textContent = `Question ${currentQuestion + 1} of ${gameQuestions.length}`;
+      timerDisplay.textContent = `Time left: ${QUESTION_TIME}s`;
+      answerInput.value = "";
+      answerInput.disabled = false;
+      submitButton.disabled = false;
+      message.textContent = "";
+      nextButton.hidden = true;
+      answerInput.focus();
+      startTimer();
+    }
+
+    startButton.addEventListener("click", startGame);
+
+    answerForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const guess = answerInput.value.trim().toLowerCase();
+      if (!guess) {
+        message.textContent = "Type your guess first!";
+        return;
+      }
+
+      const item = gameQuestions[currentQuestion];
+      const acceptedAnswers = [item.answer, ...item.aliases];
+
+      if (acceptedAnswers.includes(guess)) {
+        handleAnswerResult(true, false);
+      } else {
+        handleAnswerResult(false, false);
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      currentQuestion++;
+
+      if (currentQuestion < gameQuestions.length) {
+        showQuestion();
+      } else {
+        picture.innerHTML = "<span>Great job!</span>";
+        progress.textContent = "";
+        timerDisplay.textContent = "";
+        message.textContent = `Game over! You scored ${score} out of ${gameQuestions.length}.`;
+        nextButton.hidden = true;
+        startButton.hidden = false;
+        startButton.textContent = "Play Again";
+      }
+    });
+  </script>
+</body>
+</html>
