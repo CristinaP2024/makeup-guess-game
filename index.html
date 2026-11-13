@@ -6,164 +6,105 @@
   <title>Cabrillo College | Guess the Makeup</title>
   <style>
     * { box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      max-width: 700px;
-      margin: auto;
-      padding: 32px 16px;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      color: #24151d;
-      background: radial-gradient(circle at 12% 18%, #fff 0 3px, transparent 4px), linear-gradient(135deg,#fff0f6,#f3c9dc);
-      background-size: 45px 45px, auto;
-      transition: background-color .25s ease, background-image .25s ease;
-    }
-    body.flash-correct {
-      background: #9ae6ab !important;
-      background-image: none !important;
-    }
-    body.flash-wrong {
-      background: #f7a3a3 !important;
-      background-image: none !important;
-    }
-    .game {
-      padding: 24px;
-      background: rgba(255,248,251,.95);
-      border: 2px solid #fff;
-      border-radius: 22px;
-      box-shadow: 0 12px 35px #7b305329;
-    }
-    .college {
-      margin: 0 0 6px;
-      color: #813657;
-      font-size: 1.15rem;
-      font-weight: bold;
-      letter-spacing: .06em;
-    }
+    body { min-height: 100vh; max-width: 700px; margin: auto; padding: 32px 16px; font-family: Arial, sans-serif; text-align: center; color: #24151d; background: radial-gradient(circle at 12% 18%, #fff 0 3px, transparent 4px), linear-gradient(135deg,#fff0f6,#f3c9dc); background-size: 45px 45px, auto; }
+    .game { padding: 24px; background: rgba(255,248,251,.96); border: 2px solid #fff; border-radius: 22px; box-shadow: 0 12px 35px #7b305329; }
+    .college { margin: 0 0 6px; color: #813657; font-size: 1.15rem; font-weight: bold; letter-spacing: .06em; }
     h1 { margin-top: 8px; color: #54253d; }
-    #picture {
-      height: 260px;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      background: #f7c7dc;
-      border: 1px solid #e8a9c5;
-      border-radius: 18px;
-      margin: 20px 0;
-    }
-    #picture img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    input, button {
-      font-size: 1rem;
-      padding: 10px 13px;
-      margin: 6px;
-      color: #24151d;
-      border-radius: 9px;
-    }
-    input {
-      width: min(70%,360px);
-      background: white;
-      border: 1px solid #9b617b;
-    }
-    button {
-      background: white;
-      border: 1px solid #9b617b;
-      cursor: pointer;
-    }
-    button:hover:not(:disabled) {
-      background: #ffe4ef;
-    }
-    #message {
-      min-height: 1.5em;
-      font-weight: bold;
-    }
-    #timer {
-      font-weight: bold;
-      color: #71344f;
-    }
-    #feedbackFlash {
-      position: fixed;
-      inset: 0;
-      z-index: 5;
-      opacity: 0;
-      pointer-events: none;
-    }
-    body.flash-correct #feedbackFlash {
-      animation: greenBlink .3s ease-in-out 4;
-    }
-    body.flash-wrong #feedbackFlash {
-      animation: redBlink .3s ease-in-out 4;
-    }
-    @keyframes greenBlink {
-      0%,100% { opacity:0; background:#32c759; }
-      50% { opacity:.58; background:#32c759; }
-    }
-    @keyframes redBlink {
-      0%,100% { opacity:0; background:#f04444; }
-      50% { opacity:.58; background:#f04444; }
-    }
-    #confetti-layer {
-      position:fixed;
-      inset:0;
-      overflow:hidden;
-      z-index:10;
-      pointer-events:none;
-    }
-    .confetti-piece {
-      position:absolute;
-      top:-18px;
-      width:10px;
-      height:15px;
-      border-radius:2px;
-      animation:fall 1.8s ease-in forwards;
-    }
-    @keyframes fall {
-      to {
-        transform:translate3d(var(--drift),110vh,0) rotate(760deg);
-        opacity:.15;
-      }
-    }
+    #picture { height: 280px; display: grid; place-items: center; overflow: hidden; background: #f7c7dc; border: 1px solid #e8a9c5; border-radius: 18px; margin: 20px 0; box-shadow: inset 0 2px 12px #fff9; }
+    #picture svg { display: block; width: 100%; height: 100%; }
+    input, button { font-size: 1rem; padding: 10px 13px; margin: 6px; color: #24151d; border-radius: 9px; }
+    input { width: min(70%,360px); background: white; border: 1px solid #9b617b; }
+    button { background: white; border: 1px solid #9b617b; cursor: pointer; }
+    button:hover:not(:disabled) { background: #ffe4ef; }
+    button:disabled, input:disabled { opacity: .65; cursor: not-allowed; }
+    #message { min-height: 1.5em; font-weight: bold; }
+    #timer { font-weight: bold; color: #71344f; }
+    #feedbackFlash { position: fixed; inset: 0; z-index: 5; opacity: 0; pointer-events: none; }
+    body.flash-correct #feedbackFlash { animation: greenBlink .3s ease-in-out 4; }
+    body.flash-wrong #feedbackFlash { animation: redBlink .3s ease-in-out 4; }
+    @keyframes greenBlink { 0%,100% { opacity:0; background:#32c759; } 50% { opacity:.58; background:#32c759; } }
+    @keyframes redBlink { 0%,100% { opacity:0; background:#f04444; } 50% { opacity:.58; background:#f04444; } }
+    #confetti-layer { position:fixed; inset:0; overflow:hidden; z-index:10; pointer-events:none; }
+    .confetti-piece { position:absolute; top:-18px; width:10px; height:15px; border-radius:2px; animation:fall 1.8s ease-in forwards; }
+    @keyframes fall { to { transform:translate3d(var(--drift),110vh,0) rotate(760deg); opacity:.15; } }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; } }
   </style>
 </head>
 <body>
-  <div id="feedbackFlash" aria-hidden="true"></div>
-  <div id="confetti-layer" aria-hidden="true"></div>
+  <div id="feedbackFlash" aria-hidden="true"></div><div id="confetti-layer" aria-hidden="true"></div>
   <main class="game">
     <p class="college">Cabrillo College</p>
     <h1>Guess the Makeup!</h1>
-    <p id="progress"></p>
-    <div id="timer">Time left: 30s</div>
+    <p id="progress"></p><div id="timer">Time left: 30s</div>
     <p>What type of makeup is shown?</p>
-    <div id="picture" role="img" aria-label="Unlabelled makeup product photo">Press Start to play!</div>
-    <form id="answerForm">
-      <input id="answer" placeholder="Type your guess" autocomplete="off" disabled>
-      <button id="submitButton" type="submit" disabled>Guess</button>
-    </form>
-    <p id="message" aria-live="polite"></p>
-    <p>Score: <span id="score">0</span></p>
-    <button id="startButton" type="button">Start Game</button>
-    <button id="nextButton" type="button" hidden>Next Question</button>
+    <div id="picture" role="img" aria-label="Unlabeled makeup product illustration">Press Start to play!</div>
+    <form id="answerForm"><input id="answer" type="text" placeholder="Type your guess" autocomplete="off" disabled><button id="submitButton" type="submit" disabled>Guess</button></form>
+    <p id="message" aria-live="polite"></p><p>Score: <span id="score">0</span></p>
+    <button id="startButton" type="button">Start Game</button><button id="nextButton" type="button" hidden>Next Question</button>
   </main>
 <script>
-  const photos={makeup:"https://cdn.pixabay.com/photo/2016/03/23/19/35/makeup-1279140_1280.jpg",lipstick:"https://cdn.pixabay.com/photo/2017/01/16/19/40/lipstick-1985513_1280.jpg",mascara:"https://cdn.pixabay.com/photo/2015/12/08/00/32/mascara-1081645_1280.jpg",foundation:"https://cdn.pixabay.com/photo/2017/11/23/15/27/cosmetic-2972441_1280.jpg",brushes:"https://cdn.pixabay.com/photo/2014/11/21/17/17/makeup-brush-540120_1280.jpg",eyeshadow:"https://cdn.pixabay.com/photo/2015/02/06/20/31/eyeshadow-626095_1280.jpg",pexelsLipstick:"https://images.pexels.com/photos/461215/pexels-photo-461215.jpeg?auto=compress&fit=crop&w=800",pexelsBrushes:"https://images.pexels.com/photos/167703/pexels-photo-167703.jpeg?auto=compress&fit=crop&w=800"};
-  const questions=[
-    {answer:"lipstick",aliases:["lip stick"],image:photos.lipstick},{answer:"mascara",aliases:[],image:photos.mascara},{answer:"foundation",aliases:["liquid foundation"],image:photos.foundation},{answer:"blush",aliases:["powder blush","rouge"],image:photos.makeup},{answer:"eyeshadow",aliases:["eye shadow","eyeshadow palette","eye shadow palette"],image:photos.eyeshadow},{answer:"concealer",aliases:[],image:photos.foundation},{answer:"nail polish",aliases:["nail varnish"],image:photos.makeup},{answer:"makeup brush",aliases:["brush"],image:photos.brushes},{answer:"compact powder",aliases:["powder"],image:photos.makeup},{answer:"eyeliner",aliases:["eye liner"],image:photos.mascara},{answer:"lip gloss",aliases:["lipgloss"],image:photos.pexelsLipstick},{answer:"setting spray",aliases:["makeup setting spray"],image:photos.foundation},{answer:"highlighter",aliases:["makeup highlighter"],image:photos.makeup},{answer:"makeup sponge",aliases:["beauty sponge","blending sponge"],image:photos.pexelsBrushes},{answer:"eyebrow pencil",aliases:["brow pencil"],image:photos.brushes},{answer:"primer",aliases:["makeup primer","face primer"],image:photos.foundation},{answer:"bronzer",aliases:["powder bronzer"],image:photos.makeup},{answer:"lip liner",aliases:["lipliner","lip pencil"],image:photos.pexelsLipstick},{answer:"false eyelashes",aliases:["false lashes","fake eyelashes","false eyelash"],image:photos.mascara},{answer:"makeup remover",aliases:["makeup cleanser","cleansing water"],image:photos.makeup}
+  // Self-contained SVG artwork means every clue works without third-party image hosts.
+  // Product names are intentionally not drawn on the clue pictures.
+  const questions = [
+    {answer:"lipstick", aliases:["lip stick"], kind:"lipstick"},
+    {answer:"mascara", aliases:[], kind:"mascara"},
+    {answer:"foundation", aliases:["liquid foundation"], kind:"foundation"},
+    {answer:"blush", aliases:["powder blush","rouge"], kind:"blush"},
+    {answer:"eyeshadow", aliases:["eye shadow","eyeshadow palette","eye shadow palette"], kind:"eyeshadow"},
+    {answer:"concealer", aliases:[], kind:"concealer"},
+    {answer:"nail polish", aliases:["nail varnish"], kind:"nailpolish"},
+    {answer:"makeup brush", aliases:["brush"], kind:"brush"},
+    {answer:"compact powder", aliases:["powder"], kind:"compact"},
+    {answer:"eyeliner", aliases:["eye liner"], kind:"eyeliner"},
+    {answer:"lip gloss", aliases:["lipgloss"], kind:"lipgloss"},
+    {answer:"setting spray", aliases:["makeup setting spray"], kind:"spray"},
+    {answer:"highlighter", aliases:["makeup highlighter"], kind:"highlighter"},
+    {answer:"makeup sponge", aliases:["beauty sponge","blending sponge"], kind:"sponge"},
+    {answer:"eyebrow pencil", aliases:["brow pencil"], kind:"browpencil"},
+    {answer:"primer", aliases:["makeup primer","face primer"], kind:"primer"},
+    {answer:"bronzer", aliases:["powder bronzer"], kind:"bronzer"},
+    {answer:"lip liner", aliases:["lipliner","lip pencil"], kind:"lipliner"},
+    {answer:"false eyelashes", aliases:["false lashes","fake eyelashes","false eyelash"], kind:"lashes"},
+    {answer:"makeup remover", aliases:["makeup cleanser","cleansing water"], kind:"remover"}
   ];
+  const colors={lipstick:["#d92762","#78143d"],mascara:["#303942","#111820"],foundation:["#d8ae8a","#8b654c"],blush:["#e68ba4","#ad4f70"],eyeshadow:["#a486b4","#57415f"],concealer:["#edc3a2","#b37d5e"],nailpolish:["#c72f62","#74213f"],brush:["#c6a37f","#59404a"],compact:["#dfd2e8","#87728e"],eyeliner:["#28252b","#09090b"],lipgloss:["#ed8eae","#ae4169"],spray:["#a9dce4","#5d9ba5"],highlighter:["#f0d47a","#b89441"],sponge:["#efb1c2","#b46c83"],browpencil:["#806044","#473326"],primer:["#d7c2ef","#9275ac"],bronzer:["#bf7748","#77452e"],lipliner:["#bd4268","#70203e"],lashes:["#292832","#0c0b10"],remover:["#a9dce2","#5d9ba5"]};
+  function productShape(k){
+    const [c,d]=colors[k];
+    const cap=(x,y,w,h,rx=8)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#shade)" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>`;
+    const bottle=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(18,w/4)}" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M${x+8} ${y+12}v${h-24}" stroke="#fff" stroke-opacity=".48" stroke-width="5" stroke-linecap="round"/>`;
+    switch(k){
+      case "lipstick": return `${cap(77,128,66,100,14)}<rect x="83" y="137" width="54" height="79" rx="8" fill="url(#product)"/><path d="M89 138V77q21-29 42 0v61z" fill="url(#shade)" stroke="${d}" stroke-width="3"/><path d="M89 77q21-29 42 0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4"/>`;
+      case "mascara": return `${cap(88,47,44,45,9)}${bottle(76,84,68,124)}<path d="M132 57h27v8h-27M157 61v78" fill="none" stroke="#17171c" stroke-width="7" stroke-linecap="round"/><path d="M150 140l15 0m-14 7l13 0m-12 7l11 0m-10 7h9m-8 7h7" stroke="#111" stroke-width="3"/>`;
+      case "foundation": return `${cap(88,41,44,27,6)}<rect x="99" y="26" width="22" height="18" rx="4" fill="#b9bbc3"/>${bottle(66,69,88,143)}<rect x="80" y="111" width="60" height="54" rx="12" fill="#f2d8be" opacity=".8"/><path d="M91 132q19-15 38 0" fill="none" stroke="#b68c6e" stroke-width="3"/>`;
+      case "blush": case "bronzer": return `<ellipse cx="110" cy="147" rx="77" ry="65" fill="#322631" opacity=".18"/><rect x="36" y="64" width="148" height="105" rx="28" fill="url(#shade)" stroke="#8e6877" stroke-width="3"/><ellipse cx="110" cy="111" rx="58" ry="38" fill="url(#product)"/><path d="M58 123q52-42 104 0" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="5"/>`;
+      case "eyeshadow": return `<rect x="29" y="59" width="162" height="128" rx="19" fill="url(#shade)" stroke="#514150" stroke-width="4"/><rect x="39" y="70" width="142" height="105" rx="11" fill="#f3e8ec"/><circle cx="70" cy="104" r="19" fill="#d68b99"/><circle cx="111" cy="104" r="19" fill="#887093"/><circle cx="151" cy="104" r="19" fill="#c79c64"/><circle cx="70" cy="148" r="16" fill="#a96e6c"/><circle cx="111" cy="148" r="16" fill="#78606b"/><circle cx="151" cy="148" r="16" fill="#d9b8cb"/>`;
+      case "concealer": case "primer": return `${cap(91,43,38,34,8)}${bottle(75,73,70,139)}<rect x="86" y="111" width="48" height="49" rx="13" fill="#fff" opacity=".34"/><circle cx="110" cy="136" r="12" fill="#fff" opacity=".35"/>`;
+      case "nailpolish": return `${cap(91,40,38,49,7)}<path d="M87 87h46l13 24v94q0 12-12 12H86q-12 0-12-12v-94z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M84 135h52v53H84z" fill="#fff" opacity=".23"/><path d="M93 100v76" stroke="#fff" stroke-opacity=".4" stroke-width="5"/>`;
+      case "brush": return `<path d="M97 121q-12-37 13-65 17-17 42-8 19 9 10 29-8 19-30 27l-17 25z" fill="#d6b995" stroke="#917359" stroke-width="3"/><path d="M114 116l16 16-56 70q-9 10-19 2-7-7 0-17z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M112 130l16 13" stroke="#d7c1aa" stroke-width="5"/>`;
+      case "compact": return `<ellipse cx="110" cy="151" rx="72" ry="53" fill="#382e3b" opacity=".2"/><path d="M39 106q0-48 71-48t71 48v49q0 42-71 42t-71-42z" fill="url(#shade)" stroke="#827186" stroke-width="4"/><ellipse cx="110" cy="107" rx="58" ry="39" fill="#e6d9e8" stroke="#fff" stroke-width="3"/><ellipse cx="110" cy="107" rx="40" ry="25" fill="#f1e7e9"/>`;
+      case "eyeliner": case "browpencil": case "lipliner": return `<path d="M49 172l96-108 28 25-96 109z" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M145 64l20-23 27 24-19 24z" fill="#e5c7a2"/><path d="M49 172l29 26-24 4-16-18z" fill="#2a2029"/><path d="M79 152l65-74" stroke="#fff" stroke-opacity=".34" stroke-width="4"/>`;
+      case "lipgloss": return `${cap(92,43,36,37,8)}${bottle(76,78,68,133)}<path d="M87 111q23-19 46 0v67q-23 17-46 0z" fill="url(#product)" opacity=".75"/><path d="M89 92v71" stroke="#fff" stroke-opacity=".55" stroke-width="5"/>`;
+      case "spray": case "remover": return `${cap(91,42,38,24,5)}<path d="M99 43v-15h42v8h-25v9" fill="none" stroke="#747c83" stroke-width="7" stroke-linejoin="round"/>${bottle(72,67,76,145)}<path d="M80 145q30-19 60 0v45H80z" fill="#fff" opacity=".24"/><circle cx="97" cy="109" r="4" fill="#fff"/><circle cx="124" cy="126" r="3" fill="#fff"/>`;
+      case "highlighter": return `${cap(76,134,68,70,13)}<rect x="85" y="54" width="50" height="96" rx="15" fill="url(#product)" stroke="${d}" stroke-width="3"/><path d="M91 75h38v54H91z" fill="#fff" opacity=".35"/><path d="M103 96l7-15 7 15 16 3-12 11 3 16-14-8-14 8 3-16-12-11z" fill="#fff1b7" opacity=".8"/>`;
+      case "sponge": return `<path d="M110 42q28 0 37 31 5 19 20 34 19 22 7 52-13 34-48 40-38 7-64-17-23-21-13-50 7-20 24-35 16-14 18-33 3-22 19-22z" fill="url(#product)" stroke="${d}" stroke-width="4"/><path d="M82 112q28 21 59 0" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="7" stroke-linecap="round"/>`;
+      case "lashes": return `<path d="M35 146q72-83 150-10" fill="none" stroke="#211d26" stroke-width="9" stroke-linecap="round"/>${[48,65,83,102,121,140,158,174].map((x,i)=>`<path d="M${x} ${139-Math.sin(i/7*Math.PI)*20}l${-12+i*1.5} -${22+(i<4?i*4:(7-i)*4)}" stroke="#17151b" stroke-width="4" stroke-linecap="round"/>`).join("")}`;
+      default: return `${bottle(70,65,80,145)}`;
+    }
+  }
+  function productArt(kind){const [a,b]=colors[kind]||["#d98cae","#874765"];return `<svg viewBox="0 0 220 250" role="img" aria-label="Unlabeled makeup product illustration" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#fff8fb"/><stop offset="1" stop-color="#f3dbe5"/></linearGradient><linearGradient id="product" x1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset=".48" stop-color="${b}"/><stop offset="1" stop-color="${a}"/></linearGradient><linearGradient id="shade" x1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".3" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#563445" flood-opacity=".24"/></filter><radialGradient id="light"><stop stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="220" height="250" fill="url(#bg)"/><circle cx="34" cy="42" r="45" fill="url(#light)"/><circle cx="191" cy="203" r="52" fill="url(#light)"/><ellipse cx="110" cy="218" rx="70" ry="11" fill="#7f5367" opacity=".15"/><g filter="url(#shadow)">${productShape(kind)}</g><path d="M18 219h184" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>`;}
+
   const $=id=>document.getElementById(id), picture=$("picture"),progress=$("progress"),timerDisplay=$("timer"),answerInput=$("answer"),answerForm=$("answerForm"),submitButton=$("submitButton"),startButton=$("startButton"),nextButton=$("nextButton"),message=$("message"),scoreDisplay=$("score"),confettiLayer=$("confetti-layer");
   const QUESTION_TIME=30; let gameQuestions=[],currentQuestion=0,score=0,timerInterval=null,questionComplete=false,audioContext;
   function playSound(correct){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext??=new AC();if(audioContext.state==="suspended")audioContext.resume();const now=audioContext.currentTime;(correct?[659.25,830.61,987.77]:[220,164.81]).forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),t=now+i*(correct?.12:.18);osc.type=correct?"sine":"triangle";osc.frequency.value=hz;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.12,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+.22);osc.connect(gain);gain.connect(audioContext.destination);osc.start(t);osc.stop(t+.23);});}catch(e){}}
-  function confetti(){const colors=["#e94f9a","#f6c445","#7b61c9","#4bbf9f","#ff7b54","#fff"];for(let i=0;i<75;i++){const p=document.createElement("span");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*.55+"s";p.style.setProperty("--drift",(Math.random()*220-110)+"px");confettiLayer.appendChild(p);p.addEventListener("animationend",()=>p.remove(),{once:true});}}
+  function confetti(){const colorsList=["#e94f9a","#f6c445","#7b61c9","#4bbf9f","#ff7b54","#fff"];for(let i=0;i<75;i++){const p=document.createElement("span");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.backgroundColor=colorsList[Math.floor(Math.random()*colorsList.length)];p.style.animationDelay=Math.random()*.55+"s";p.style.setProperty("--drift",(Math.random()*220-110)+"px");confettiLayer.appendChild(p);p.addEventListener("animationend",()=>p.remove(),{once:true});}}
   function blink(correct){document.body.classList.remove("flash-correct","flash-wrong");void document.body.offsetWidth;document.body.classList.add(correct?"flash-correct":"flash-wrong");setTimeout(()=>document.body.classList.remove("flash-correct","flash-wrong"),1300);}
   function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
   function result(correct,timedOut=false){if(questionComplete)return;questionComplete=true;stopTimer();const q=gameQuestions[currentQuestion];answerInput.disabled=true;submitButton.disabled=true;playSound(correct);if(correct){score++;scoreDisplay.textContent=score;message.textContent="Correct! 🎉";blink(true);confetti();}else{message.textContent=timedOut?`Time's up! It was ${q.answer}.`:`Not quite! It was ${q.answer}.`;blink(false);}nextButton.textContent=currentQuestion===gameQuestions.length-1?"See Final Score":"Next Question";nextButton.hidden=false;}
   function startTimer(){stopTimer();let left=QUESTION_TIME;timerDisplay.textContent=`Time left: ${left}s`;timerInterval=setInterval(()=>{left--;timerDisplay.textContent=`Time left: ${left}s`;if(left<=0)result(false,true);},1000);}
-  function showQuestion(){const q=gameQuestions[currentQuestion];picture.innerHTML="";const img=document.createElement("img");img.src=q.image;img.alt="Unlabelled makeup product photo";img.onerror=()=>{img.onerror=null;img.src=photos.makeup;};picture.appendChild(img);progress.textContent=`Question ${currentQuestion+1} of ${gameQuestions.length}`;answerInput.value="";answerInput.disabled=false;submitButton.disabled=false;message.textContent="";nextButton.hidden=true;questionComplete=false;answerInput.focus();startTimer();}
+  function showQuestion(){const q=gameQuestions[currentQuestion];picture.innerHTML=productArt(q.kind);picture.setAttribute("aria-label","Unlabeled makeup product illustration");progress.textContent=`Question ${currentQuestion+1} of ${gameQuestions.length}`;answerInput.value="";answerInput.disabled=false;submitButton.disabled=false;message.textContent="";nextButton.hidden=true;questionComplete=false;answerInput.focus();startTimer();}
   startButton.addEventListener("click",()=>{gameQuestions=[...questions].sort(()=>Math.random()-.5);currentQuestion=0;score=0;scoreDisplay.textContent=score;startButton.hidden=true;showQuestion();});
   answerForm.addEventListener("submit",e=>{e.preventDefault();const guess=answerInput.value.trim().toLowerCase();if(!guess){message.textContent="Type your guess first!";return;}const q=gameQuestions[currentQuestion];result([q.answer,...q.aliases].map(a=>a.toLowerCase()).includes(guess));});
-  nextButton.addEventListener("click",()=>{currentQuestion++;if(currentQuestion<gameQuestions.length)showQuestion();else{stopTimer();picture.textContent="Great job!";progress.textContent="";timerDisplay.textContent="";message.textContent=`Game over! You scored ${score} out of ${gameQuestions.length}.`;nextButton.hidden=true;startButton.hidden=false;startButton.textContent="Play Again";}});
+  nextButton.addEventListener("click",()=>{currentQuestion++;if(currentQuestion<gameQuestions.length)showQuestion();else{stopTimer();picture.innerHTML="<span style='font-size:70px'>Great job!</span>";progress.textContent="";timerDisplay.textContent="";message.textContent=`Game over! You scored ${score} out of ${gameQuestions.length}.`;nextButton.hidden=true;startButton.hidden=false;startButton.textContent="Play Again";}});
 </script>
 </body>
 </html>
