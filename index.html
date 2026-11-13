@@ -3,142 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Guess the Makeup | Cabrillo College</title>
+  <title>Cabrillo College | Guess the Makeup</title>
   <style>
     * { box-sizing: border-box; }
-    html { min-height: 100%; background: #f9dce9; }
-    body {
-      position: relative; isolation: isolate; min-height: 100vh;
-      width: min(100% - 24px, 680px); margin: 0 auto; padding: 34px 0;
-      font-family: Arial, sans-serif; text-align: center; color: #24151d;
-      background-color: #f9dce9;
-      background-image: radial-gradient(circle at 12% 18%, rgba(255,255,255,.82) 0 3px, transparent 4px), radial-gradient(circle at 82% 28%, rgba(255,255,255,.65) 0 5px, transparent 6px), radial-gradient(circle at 22% 78%, rgba(213,105,154,.16) 0 8px, transparent 9px), radial-gradient(circle at 90% 82%, rgba(213,105,154,.17) 0 6px, transparent 7px), linear-gradient(135deg, #fff0f6 0%, #f8d7e5 48%, #fceaf2 100%);
-      background-size: 47px 47px, 73px 73px, 91px 91px, 67px 67px, auto;
-    }
-    body::before, body::after { content: "✦  ·  ✧  ·  ✦"; position: fixed; z-index: -1; color: rgba(159,63,107,.3); font-size: 25px; letter-spacing: 18px; pointer-events: none; }
-    body::before { top: 9%; left: 3%; transform: rotate(-15deg); }
-    body::after { right: 2%; bottom: 10%; transform: rotate(15deg); }
+    body { min-height: 100vh; max-width: 700px; margin: auto; padding: 32px 16px; font-family: Arial, sans-serif; text-align: center; color: #24151d; background: radial-gradient(circle at 12% 18%, #fff 0 3px, transparent 4px), linear-gradient(135deg,#fff0f6,#f3c9dc); background-size: 45px 45px, auto; }
+    .game { padding: 24px; background: rgba(255,248,251,.95); border: 2px solid #fff; border-radius: 22px; box-shadow: 0 12px 35px #7b305329; }
+    .college { margin: 0 0 6px; color: #813657; font-size: 1.15rem; font-weight: bold; letter-spacing: .06em; }
+    h1 { margin-top: 8px; color: #54253d; }
+    #picture { height: 260px; display: grid; place-items: center; overflow: hidden; background: #f7c7dc; border: 1px solid #e8a9c5; border-radius: 18px; margin: 20px 0; }
+    #picture img { width: 100%; height: 100%; object-fit: cover; }
+    input, button { font-size: 1rem; padding: 10px 13px; margin: 6px; color: #24151d; border-radius: 9px; }
+    input { width: min(70%,360px); background: white; border: 1px solid #9b617b; }
+    button { background: white; border: 1px solid #9b617b; cursor: pointer; }
+    button:hover:not(:disabled) { background: #ffe4ef; }
+    #message { min-height: 1.5em; font-weight: bold; }
+    #timer { font-weight: bold; color: #71344f; }
     #feedbackFlash { position: fixed; inset: 0; z-index: 5; opacity: 0; pointer-events: none; }
     body.flash-correct #feedbackFlash { animation: greenBlink .3s ease-in-out 4; }
     body.flash-wrong #feedbackFlash { animation: redBlink .3s ease-in-out 4; }
-    @keyframes greenBlink { 0%,100% { opacity: 0; background: #32c759; } 50% { opacity: .58; background: #32c759; } }
-    @keyframes redBlink { 0%,100% { opacity: 0; background: #f04444; } 50% { opacity: .58; background: #f04444; } }
-    .game { position: relative; padding: 24px; background: rgba(255,248,251,.94); border: 2px solid rgba(255,255,255,.95); border-radius: 22px; box-shadow: 0 12px 35px rgba(123,48,83,.18), 0 0 0 6px rgba(255,255,255,.28); }
-    .college { margin: 0 0 6px; color: #813657; font-size: 1.08rem; font-weight: bold; letter-spacing: .06em; }
-    h1 { margin-top: 8px; color: #54253d; }
-    #picture { height: 260px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(145deg,#f7c7dc,#fbe0eb); border: 1px solid #e8a9c5; border-radius: 18px; margin: 20px 0; box-shadow: inset 0 2px 12px rgba(255,255,255,.8); }
-    #picture img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    input, button { font-size: 1rem; padding: 10px 13px; margin: 6px; color: #24151d; border-radius: 9px; }
-    input { width: min(70%,360px); background: #fff; border: 1px solid #9b617b; }
-    button { background: #fff; border: 1px solid #9b617b; cursor: pointer; transition: transform .12s,background-color .12s; }
-    button:hover:not(:disabled) { transform: translateY(-1px); background: #ffe4ef; }
-    button:disabled,input:disabled { cursor: not-allowed; opacity: .65; }
-    #message { min-height: 1.5em; font-weight: bold; }
-    #timer { font-weight: bold; margin: 10px 0 8px; color: #71344f; }
-    #confetti-layer { position: fixed; inset: 0; overflow: hidden; z-index: 10; pointer-events: none; }
-    .confetti-piece { position: absolute; top: -18px; width: 10px; height: 15px; border-radius: 2px; animation: confetti-fall 1.8s ease-in forwards; }
-    @keyframes confetti-fall { to { transform: translate3d(var(--drift),110vh,0) rotate(760deg); opacity: .15; } }
-    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    @keyframes greenBlink { 0%,100% { opacity:0; background:#32c759; } 50% { opacity:.58; background:#32c759; } }
+    @keyframes redBlink { 0%,100% { opacity:0; background:#f04444; } 50% { opacity:.58; background:#f04444; } }
+    #confetti-layer { position:fixed; inset:0; overflow:hidden; z-index:10; pointer-events:none; }
+    .confetti-piece { position:absolute; top:-18px; width:10px; height:15px; border-radius:2px; animation:fall 1.8s ease-in forwards; }
+    @keyframes fall { to { transform:translate3d(var(--drift),110vh,0) rotate(760deg); opacity:.15; } }
   </style>
 </head>
 <body>
-  <div id="feedbackFlash" aria-hidden="true"></div>
-  <div id="confetti-layer" aria-hidden="true"></div>
+  <div id="feedbackFlash" aria-hidden="true"></div><div id="confetti-layer" aria-hidden="true"></div>
   <main class="game">
     <p class="college">Cabrillo College</p>
     <h1>Guess the Makeup!</h1>
-    <p id="progress"></p>
-    <div id="timer">Time left: 30s</div>
+    <p id="progress"></p><div id="timer">Time left: 30s</div>
     <p>What type of makeup is shown?</p>
-    <div id="picture" role="img" aria-label="Makeup product photograph">Press Start to play!</div>
-    <form id="answerForm">
-      <input id="answer" type="text" placeholder="Type your guess" autocomplete="off" disabled>
-      <button id="submitButton" type="submit" disabled>Guess</button>
-    </form>
-    <p id="message" aria-live="polite"></p>
-    <p>Score: <span id="score">0</span></p>
-    <button id="startButton" type="button">Start Game</button>
-    <button id="nextButton" type="button" hidden>Next Question</button>
+    <div id="picture" role="img" aria-label="Unlabelled makeup product photo">Press Start to play!</div>
+    <form id="answerForm"><input id="answer" placeholder="Type your guess" autocomplete="off" disabled><button id="submitButton" type="submit" disabled>Guess</button></form>
+    <p id="message" aria-live="polite"></p><p>Score: <span id="score">0</span></p>
+    <button id="startButton" type="button">Start Game</button><button id="nextButton" type="button" hidden>Next Question</button>
   </main>
-  <script>
-    // These are linked stock photographs, not generated illustrations. The photo hosts may change their URLs over time.
-    const photos = {
-      makeup: "https://cdn.pixabay.com/photo/2016/03/23/19/35/makeup-1279140_1280.jpg",
-      lipstick: "https://cdn.pixabay.com/photo/2017/01/16/19/40/lipstick-1985513_1280.jpg",
-      mascara: "https://cdn.pixabay.com/photo/2015/12/08/00/32/mascara-1081645_1280.jpg",
-      foundation: "https://cdn.pixabay.com/photo/2017/11/23/15/27/cosmetic-2972441_1280.jpg",
-      brushes: "https://cdn.pixabay.com/photo/2014/11/21/17/17/makeup-brush-540120_1280.jpg",
-      eyeshadow: "https://cdn.pixabay.com/photo/2015/02/06/20/31/eyeshadow-626095_1280.jpg",
-      pexelsLipstick: "https://images.pexels.com/photos/461215/pexels-photo-461215.jpeg?auto=compress&fit=crop&w=800",
-      pexelsBrushes: "https://images.pexels.com/photos/167703/pexels-photo-167703.jpeg?auto=compress&fit=crop&w=800"
-    };
-    const questions = [
-      {answer:"lipstick",aliases:["lip stick"],image:photos.lipstick},
-      {answer:"mascara",aliases:[],image:photos.mascara},
-      {answer:"foundation",aliases:["liquid foundation"],image:photos.foundation},
-      {answer:"blush",aliases:["powder blush","rouge"],image:photos.makeup},
-      {answer:"eyeshadow",aliases:["eye shadow","eyeshadow palette","eye shadow palette"],image:photos.eyeshadow},
-      {answer:"concealer",aliases:[],image:photos.foundation},
-      {answer:"nail polish",aliases:["nail varnish"],image:photos.makeup},
-      {answer:"makeup brush",aliases:["brush"],image:photos.brushes},
-      {answer:"compact powder",aliases:["powder"],image:photos.makeup},
-      {answer:"eyeliner",aliases:["eye liner"],image:photos.mascara},
-      {answer:"lip gloss",aliases:["lipgloss"],image:photos.pexelsLipstick},
-      {answer:"setting spray",aliases:["makeup setting spray"],image:photos.foundation},
-      {answer:"highlighter",aliases:["makeup highlighter"],image:photos.makeup},
-      {answer:"makeup sponge",aliases:["beauty sponge","blending sponge"],image:photos.pexelsBrushes},
-      {answer:"eyebrow pencil",aliases:["brow pencil"],image:photos.brushes},
-      {answer:"primer",aliases:["makeup primer","face primer"],image:photos.foundation},
-      {answer:"bronzer",aliases:["powder bronzer"],image:photos.makeup},
-      {answer:"lip liner",aliases:["lipliner","lip pencil"],image:photos.pexelsLipstick},
-      {answer:"false eyelashes",aliases:["false lashes","fake eyelashes","false eyelash"],image:photos.mascara},
-      {answer:"makeup remover",aliases:["makeup cleanser","cleansing water"],image:photos.makeup}
-    ];
-    const picture=document.getElementById("picture"), progress=document.getElementById("progress"), timerDisplay=document.getElementById("timer"), answerInput=document.getElementById("answer"), answerForm=document.getElementById("answerForm"), submitButton=document.getElementById("submitButton"), startButton=document.getElementById("startButton"), nextButton=document.getElementById("nextButton"), message=document.getElementById("message"), scoreDisplay=document.getElementById("score"), confettiLayer=document.getElementById("confetti-layer");
-    const QUESTION_TIME=30;
-    let gameQuestions=[],currentQuestion=0,score=0,timerInterval=null,questionComplete=false,audioContext;
-
-    function playAnswerSound(correct) {
-      try {
-        const AudioContextClass=window.AudioContext||window.webkitAudioContext;
-        if(!AudioContextClass)return;
-        audioContext??=new AudioContextClass();
-        if(audioContext.state==="suspended")audioContext.resume();
-        const now=audioContext.currentTime, notes=correct?[659.25,830.61,987.77]:[220,164.81];
-        notes.forEach((frequency,index)=>{
-          const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+index*(correct?.12:.18);
-          oscillator.type=correct?"sine":"triangle"; oscillator.frequency.setValueAtTime(frequency,start);
-          gain.gain.setValueAtTime(.0001,start); gain.gain.exponentialRampToValueAtTime(.14,start+.02); gain.gain.exponentialRampToValueAtTime(.0001,start+(correct?.2:.24));
-          oscillator.connect(gain);gain.connect(audioContext.destination);oscillator.start(start);oscillator.stop(start+(correct?.21:.25));
-        });
-      } catch(error) { /* Sound is optional; the game still works if audio is unavailable. */ }
-    }
-    function showConfetti() {
-      const colors=["#e94f9a","#f6c445","#7b61c9","#4bbf9f","#ff7b54","#fff"];
-      for(let i=0;i<75;i++){
-        const piece=document.createElement("span");piece.className="confetti-piece";piece.style.left=`${Math.random()*100}%`;piece.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];piece.style.animationDelay=`${Math.random()*.55}s`;piece.style.setProperty("--drift",`${Math.random()*220-110}px`);confettiLayer.appendChild(piece);piece.addEventListener("animationend",()=>piece.remove(),{once:true});
-      }
-    }
-    function flashBackground(type) {
-      document.body.classList.remove("flash-correct","flash-wrong");void document.body.offsetWidth;document.body.classList.add(type==="correct"?"flash-correct":"flash-wrong");
-      setTimeout(()=>document.body.classList.remove("flash-correct","flash-wrong"),1300);
-    }
-    function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
-    function handleAnswerResult(correct,timedOut=false){
-      if(questionComplete)return;questionComplete=true;stopTimer();const item=gameQuestions[currentQuestion];answerInput.disabled=true;submitButton.disabled=true;playAnswerSound(correct);
-      if(correct){score++;scoreDisplay.textContent=score;message.textContent="Correct! 🎉";flashBackground("correct");showConfetti();}
-      else{message.textContent=timedOut?`Time's up! It was ${item.answer}.`:`Not quite! It was ${item.answer}.`;flashBackground("wrong");}
-      nextButton.textContent=currentQuestion===gameQuestions.length-1?"See Final Score":"Next Question";nextButton.hidden=false;
-    }
-    function startTimer(){stopTimer();let timeLeft=QUESTION_TIME;timerDisplay.textContent=`Time left: ${timeLeft}s`;timerInterval=setInterval(()=>{timeLeft--;timerDisplay.textContent=`Time left: ${timeLeft}s`;if(timeLeft<=0)handleAnswerResult(false,true);},1000);}
-    function showQuestion(){
-      const item=gameQuestions[currentQuestion];picture.innerHTML="";const image=document.createElement("img");image.src=item.image;image.alt="Unlabelled makeup product photo";image.onerror=()=>{image.onerror=null;image.src=photos.makeup;};picture.appendChild(image);picture.setAttribute("aria-label","Unlabelled makeup product photograph");
-      progress.textContent=`Question ${currentQuestion+1} of ${gameQuestions.length}`;answerInput.value="";answerInput.disabled=false;submitButton.disabled=false;message.textContent="";nextButton.hidden=true;questionComplete=false;answerInput.focus();startTimer();
-    }
-    function startGame(){gameQuestions=[...questions].sort(()=>Math.random()-.5);currentQuestion=0;score=0;scoreDisplay.textContent=score;startButton.hidden=true;showQuestion();}
-    startButton.addEventListener("click",startGame);
-    answerForm.addEventListener("submit",event=>{event.preventDefault();const guess=answerInput.value.trim().toLowerCase();if(!guess){message.textContent="Type your guess first!";return;}const item=gameQuestions[currentQuestion],accepted=[item.answer,...item.aliases].map(answer=>answer.toLowerCase());handleAnswerResult(accepted.includes(guess));});
-    nextButton.addEventListener("click",()=>{currentQuestion++;if(currentQuestion<gameQuestions.length)showQuestion();else{stopTimer();picture.textContent="Great job!";progress.textContent="";timerDisplay.textContent="";message.textContent=`Game over! You scored ${score} out of ${gameQuestions.length}.`;nextButton.hidden=true;startButton.hidden=false;startButton.textContent="Play Again";}});
-  </script>
+<script>
+  const photos={makeup:"https://cdn.pixabay.com/photo/2016/03/23/19/35/makeup-1279140_1280.jpg",lipstick:"https://cdn.pixabay.com/photo/2017/01/16/19/40/lipstick-1985513_1280.jpg",mascara:"https://cdn.pixabay.com/photo/2015/12/08/00/32/mascara-1081645_1280.jpg",foundation:"https://cdn.pixabay.com/photo/2017/11/23/15/27/cosmetic-2972441_1280.jpg",brushes:"https://cdn.pixabay.com/photo/2014/11/21/17/17/makeup-brush-540120_1280.jpg",eyeshadow:"https://cdn.pixabay.com/photo/2015/02/06/20/31/eyeshadow-626095_1280.jpg",pexelsLipstick:"https://images.pexels.com/photos/461215/pexels-photo-461215.jpeg?auto=compress&fit=crop&w=800",pexelsBrushes:"https://images.pexels.com/photos/167703/pexels-photo-167703.jpeg?auto=compress&fit=crop&w=800"};
+  const questions=[
+    {answer:"lipstick",aliases:["lip stick"],image:photos.lipstick},{answer:"mascara",aliases:[],image:photos.mascara},{answer:"foundation",aliases:["liquid foundation"],image:photos.foundation},{answer:"blush",aliases:["powder blush","rouge"],image:photos.makeup},{answer:"eyeshadow",aliases:["eye shadow","eyeshadow palette","eye shadow palette"],image:photos.eyeshadow},{answer:"concealer",aliases:[],image:photos.foundation},{answer:"nail polish",aliases:["nail varnish"],image:photos.makeup},{answer:"makeup brush",aliases:["brush"],image:photos.brushes},{answer:"compact powder",aliases:["powder"],image:photos.makeup},{answer:"eyeliner",aliases:["eye liner"],image:photos.mascara},{answer:"lip gloss",aliases:["lipgloss"],image:photos.pexelsLipstick},{answer:"setting spray",aliases:["makeup setting spray"],image:photos.foundation},{answer:"highlighter",aliases:["makeup highlighter"],image:photos.makeup},{answer:"makeup sponge",aliases:["beauty sponge","blending sponge"],image:photos.pexelsBrushes},{answer:"eyebrow pencil",aliases:["brow pencil"],image:photos.brushes},{answer:"primer",aliases:["makeup primer","face primer"],image:photos.foundation},{answer:"bronzer",aliases:["powder bronzer"],image:photos.makeup},{answer:"lip liner",aliases:["lipliner","lip pencil"],image:photos.pexelsLipstick},{answer:"false eyelashes",aliases:["false lashes","fake eyelashes","false eyelash"],image:photos.mascara},{answer:"makeup remover",aliases:["makeup cleanser","cleansing water"],image:photos.makeup}
+  ];
+  const $=id=>document.getElementById(id), picture=$("picture"),progress=$("progress"),timerDisplay=$("timer"),answerInput=$("answer"),answerForm=$("answerForm"),submitButton=$("submitButton"),startButton=$("startButton"),nextButton=$("nextButton"),message=$("message"),scoreDisplay=$("score"),confettiLayer=$("confetti-layer");
+  const QUESTION_TIME=30; let gameQuestions=[],currentQuestion=0,score=0,timerInterval=null,questionComplete=false,audioContext;
+  function playSound(correct){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext??=new AC();if(audioContext.state==="suspended")audioContext.resume();const now=audioContext.currentTime;(correct?[659.25,830.61,987.77]:[220,164.81]).forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),t=now+i*(correct?.12:.18);osc.type=correct?"sine":"triangle";osc.frequency.value=hz;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.12,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+.22);osc.connect(gain);gain.connect(audioContext.destination);osc.start(t);osc.stop(t+.23);});}catch(e){}}
+  function confetti(){const colors=["#e94f9a","#f6c445","#7b61c9","#4bbf9f","#ff7b54","#fff"];for(let i=0;i<75;i++){const p=document.createElement("span");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*.55+"s";p.style.setProperty("--drift",(Math.random()*220-110)+"px");confettiLayer.appendChild(p);p.addEventListener("animationend",()=>p.remove(),{once:true});}}
+  function blink(correct){document.body.classList.remove("flash-correct","flash-wrong");void document.body.offsetWidth;document.body.classList.add(correct?"flash-correct":"flash-wrong");setTimeout(()=>document.body.classList.remove("flash-correct","flash-wrong"),1300);}
+  function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+  function result(correct,timedOut=false){if(questionComplete)return;questionComplete=true;stopTimer();const q=gameQuestions[currentQuestion];answerInput.disabled=true;submitButton.disabled=true;playSound(correct);if(correct){score++;scoreDisplay.textContent=score;message.textContent="Correct! 🎉";blink(true);confetti();}else{message.textContent=timedOut?`Time's up! It was ${q.answer}.`:`Not quite! It was ${q.answer}.`;blink(false);}nextButton.textContent=currentQuestion===gameQuestions.length-1?"See Final Score":"Next Question";nextButton.hidden=false;}
+  function startTimer(){stopTimer();let left=QUESTION_TIME;timerDisplay.textContent=`Time left: ${left}s`;timerInterval=setInterval(()=>{left--;timerDisplay.textContent=`Time left: ${left}s`;if(left<=0)result(false,true);},1000);}
+  function showQuestion(){const q=gameQuestions[currentQuestion];picture.innerHTML="";const img=document.createElement("img");img.src=q.image;img.alt="Unlabelled makeup product photo";img.onerror=()=>{img.onerror=null;img.src=photos.makeup;};picture.appendChild(img);progress.textContent=`Question ${currentQuestion+1} of ${gameQuestions.length}`;answerInput.value="";answerInput.disabled=false;submitButton.disabled=false;message.textContent="";nextButton.hidden=true;questionComplete=false;answerInput.focus();startTimer();}
+  startButton.addEventListener("click",()=>{gameQuestions=[...questions].sort(()=>Math.random()-.5);currentQuestion=0;score=0;scoreDisplay.textContent=score;startButton.hidden=true;showQuestion();});
+  answerForm.addEventListener("submit",e=>{e.preventDefault();const guess=answerInput.value.trim().toLowerCase();if(!guess){message.textContent="Type your guess first!";return;}const q=gameQuestions[currentQuestion];result([q.answer,...q.aliases].map(a=>a.toLowerCase()).includes(guess));});
+  nextButton.addEventListener("click",()=>{currentQuestion++;if(currentQuestion<gameQuestions.length)showQuestion();else{stopTimer();picture.textContent="Great job!";progress.textContent="";timerDisplay.textContent="";message.textContent=`Game over! You scored ${score} out of ${gameQuestions.length}.`;nextButton.hidden=true;startButton.hidden=false;startButton.textContent="Play Again";}});
+</script>
 </body>
 </html>
