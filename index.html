@@ -5,21 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guess the Makeup | Cabrillo College</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 620px; margin: 40px auto; padding: 20px; text-align: center; background: #fce9f1; color: #000; transition: background-color .25s ease; }
-    body.flash-correct { background: #9ae6ab; }
-    body.flash-wrong { background: #f7a3a3; }
-    .game { padding: 24px; background: #fce9f1; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
-    .college { font-size: 1.1rem; font-weight: bold; margin: 0 0 8px; }
-    #picture { height: 220px; display: grid; place-items: center; background: #f3bfd4; border-radius: 12px; margin: 20px 0; font-size: 100px; }
-    input, button { font-size: 1rem; padding: 10px; margin: 6px; color: #000; }
-    input { width: 70%; box-sizing: border-box; background: #fff; border: 1px solid #000; }
-    button { background: #fff; border: 1px solid #000; cursor: pointer; }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: #f9dce9; }
+    body {
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+      width: min(100% - 24px, 680px);
+      margin: 0 auto;
+      padding: 34px 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: #24151d;
+      background-color: #f9dce9;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.82) 0 3px, transparent 4px),
+        radial-gradient(circle at 82% 28%, rgba(255,255,255,.65) 0 5px, transparent 6px),
+        radial-gradient(circle at 22% 78%, rgba(213,105,154,.16) 0 8px, transparent 9px),
+        radial-gradient(circle at 90% 82%, rgba(213,105,154,.17) 0 6px, transparent 7px),
+        linear-gradient(135deg, #fff0f6 0%, #f8d7e5 48%, #fceaf2 100%);
+      background-size: 47px 47px, 73px 73px, 91px 91px, 67px 67px, auto;
+      transition: background-color .25s ease;
+    }
+    body::before, body::after {
+      content: "✦  ·  ✧  ·  ✦";
+      position: fixed;
+      z-index: -1;
+      color: rgba(159, 63, 107, .3);
+      font-size: 25px;
+      letter-spacing: 18px;
+      pointer-events: none;
+    }
+    body::before { top: 9%; left: 3%; transform: rotate(-15deg); }
+    body::after { right: 2%; bottom: 10%; transform: rotate(15deg); }
+    body.flash-correct { background-color: #c9f3d3; }
+    body.flash-wrong { background-color: #ffc4c4; }
+    .game {
+      position: relative;
+      padding: 24px;
+      background: rgba(255, 248, 251, .94);
+      border: 2px solid rgba(255,255,255,.95);
+      border-radius: 22px;
+      box-shadow: 0 12px 35px rgba(123, 48, 83, .18), 0 0 0 6px rgba(255,255,255,.28);
+    }
+    .college { margin: 0 0 6px; color: #813657; font-size: 1.08rem; font-weight: bold; letter-spacing: .06em; }
+    h1 { margin-top: 8px; color: #54253d; }
+    #picture {
+      height: 220px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #f7c7dc, #fbe0eb);
+      border: 1px solid #e8a9c5;
+      border-radius: 18px;
+      margin: 20px 0;
+      font-size: 100px;
+      box-shadow: inset 0 2px 12px rgba(255,255,255,.8);
+    }
+    input, button { font-size: 1rem; padding: 10px 13px; margin: 6px; color: #24151d; border-radius: 9px; }
+    input { width: min(70%, 360px); background: #fff; border: 1px solid #9b617b; }
+    button { background: #fff; border: 1px solid #9b617b; cursor: pointer; transition: transform .12s, background-color .12s; }
+    button:hover:not(:disabled) { transform: translateY(-1px); background: #ffe4ef; }
     button:disabled, input:disabled { cursor: not-allowed; opacity: .65; }
     #message { min-height: 1.5em; font-weight: bold; }
-    #timer { font-weight: bold; margin: 10px 0 8px; }
+    #timer { font-weight: bold; margin: 10px 0 8px; color: #71344f; }
+    #confetti-layer { position: fixed; inset: 0; overflow: hidden; z-index: 10; pointer-events: none; }
+    .confetti-piece { position: absolute; top: -18px; width: 10px; height: 15px; border-radius: 2px; animation: confetti-fall 1.8s ease-in forwards; }
+    @keyframes confetti-fall { to { transform: translate3d(var(--drift), 110vh, 0) rotate(760deg); opacity: .15; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
 </head>
 <body>
+  <div id="confetti-layer" aria-hidden="true"></div>
   <main class="game">
     <p class="college">Cabrillo College</p>
     <h1>Guess the Makeup!</h1>
@@ -70,13 +126,56 @@
     const nextButton = document.getElementById("nextButton");
     const message = document.getElementById("message");
     const scoreDisplay = document.getElementById("score");
+    const confettiLayer = document.getElementById("confetti-layer");
     const QUESTION_TIME = 30;
     let gameQuestions = [];
     let currentQuestion = 0;
     let score = 0;
-    let timeLeft = QUESTION_TIME;
     let timerInterval = null;
     let questionComplete = false;
+    let audioContext;
+
+    function playAnswerSound(isCorrect) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioContext ??= new AudioContextClass();
+        if (audioContext.state === "suspended") audioContext.resume();
+        const now = audioContext.currentTime;
+        const notes = isCorrect ? [659.25, 830.61, 987.77] : [220, 164.81];
+        notes.forEach((frequency, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const start = now + index * (isCorrect ? 0.12 : 0.18);
+          oscillator.type = isCorrect ? "sine" : "triangle";
+          oscillator.frequency.setValueAtTime(frequency, start);
+          gain.gain.setValueAtTime(0.0001, start);
+          gain.gain.exponentialRampToValueAtTime(0.14, start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + (isCorrect ? 0.2 : 0.24));
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(start);
+          oscillator.stop(start + (isCorrect ? 0.21 : 0.25));
+        });
+      } catch (error) {
+        // Sound is optional; the game still works if browser audio is unavailable.
+      }
+    }
+
+    function showConfetti() {
+      const colors = ["#e94f9a", "#f6c445", "#7b61c9", "#4bbf9f", "#ff7b54", "#ffffff"];
+      for (let i = 0; i < 75; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = `${Math.random() * 0.55}s`;
+        piece.style.setProperty("--drift", `${Math.random() * 220 - 110}px`);
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confettiLayer.appendChild(piece);
+        piece.addEventListener("animationend", () => piece.remove(), { once: true });
+      }
+    }
 
     function flashBackground(type) {
       document.body.classList.remove("flash-correct", "flash-wrong");
@@ -97,11 +196,13 @@
       const item = gameQuestions[currentQuestion];
       answerInput.disabled = true;
       submitButton.disabled = true;
+      playAnswerSound(isCorrect);
       if (isCorrect) {
         score++;
         scoreDisplay.textContent = score;
         message.textContent = "Correct! 🎉";
         flashBackground("correct");
+        showConfetti();
       } else {
         message.textContent = timedOut ? `Time's up! It was ${item.answer}.` : `Not quite! It was ${item.answer}.`;
         flashBackground("wrong");
@@ -112,7 +213,7 @@
 
     function startTimer() {
       stopTimer();
-      timeLeft = QUESTION_TIME;
+      let timeLeft = QUESTION_TIME;
       timerDisplay.textContent = `Time left: ${timeLeft}s`;
       timerInterval = setInterval(() => {
         timeLeft--;
